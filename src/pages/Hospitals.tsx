@@ -1,121 +1,40 @@
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { Pencil, Plus } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 type Hospital = {
   _id: string;
   name: string;
   city: string;
-  address?: string;
+  facilityType?: string;
   type: string;
-  acceptsAarogyasri: boolean;
-  offersPalliative: boolean;
-  tags?: string[];
-};
-
-type FormValues = {
-  name: string;
-  city: string;
-  address: string;
-  type: string;
-  acceptsAarogyasri: boolean;
-  offersPalliative: boolean;
-  tags: string;
+  accreditations?: string[];
+  hfrVerified?: boolean;
+  govtSchemes?: string[];
 };
 
 export function HospitalsPage() {
   const [items, setItems] = useState<Hospital[]>([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Hospital | null>(null);
+  const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<FormValues>();
-
-  const load = async () => {
-    try {
-      const res = await api.get('/hospitals');
-      setItems(res.data);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { load(); }, []);
-
-  const openAdd = () => {
-    setEditing(null);
-    reset({
-      name: '',
-      city: '',
-      address: '',
-      type: 'private',
-      acceptsAarogyasri: false,
-      offersPalliative: false,
-      tags: '',
-    });
-    setOpen(true);
-  };
-
-  const openEdit = (h: Hospital) => {
-    setEditing(h);
-    reset({
-      name: h.name,
-      city: h.city,
-      address: h.address ?? '',
-      type: h.type,
-      acceptsAarogyasri: h.acceptsAarogyasri,
-      offersPalliative: h.offersPalliative,
-      tags: (h.tags ?? []).join(', '),
-    });
-    setOpen(true);
-  };
-
-  const onSubmit = async (data: FormValues) => {
-    const payload = {
-      name: data.name,
-      city: data.city,
-      address: data.address,
-      type: data.type,
-      acceptsAarogyasri: data.acceptsAarogyasri,
-      offersPalliative: data.offersPalliative,
-      tags: data.tags
-        ? data.tags.split(',').map((s) => s.trim()).filter(Boolean)
-        : [],
-    };
-    if (editing) {
-      await api.patch(`/hospitals/${editing._id}`, payload);
-    } else {
-      await api.post('/hospitals', payload);
-    }
-    setOpen(false);
-    load();
-  };
+  useEffect(() => {
+    api.get('/hospitals')
+      .then((res) => setItems(res.data))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         title="Hospitals"
-        description="Manage hospital records."
+        description="Manage hospital and cancer centre records."
         action={
-          <Button onClick={openAdd}>
+          <Button onClick={() => navigate('/hospitals/new')}>
             <Plus className="w-4 h-4" />
             Add Hospital
           </Button>
@@ -130,8 +49,8 @@ export function HospitalsPage() {
                 <th className="px-4 py-3 font-medium text-muted-foreground">Name</th>
                 <th className="px-4 py-3 font-medium text-muted-foreground">City</th>
                 <th className="px-4 py-3 font-medium text-muted-foreground">Type</th>
-                <th className="px-4 py-3 font-medium text-muted-foreground">Aarogyasri</th>
-                <th className="px-4 py-3 font-medium text-muted-foreground">Palliative</th>
+                <th className="px-4 py-3 font-medium text-muted-foreground">Accreditations</th>
+                <th className="px-4 py-3 font-medium text-muted-foreground">Schemes</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -151,33 +70,49 @@ export function HospitalsPage() {
               ) : (
                 items.map((h) => (
                   <tr key={h._id} className="border-b last:border-0 hover:bg-muted/30">
-                    <td className="px-4 py-3 font-medium">{h.name}</td>
-                    <td className="px-4 py-3">{h.city}</td>
-                    <td className="px-4 py-3 capitalize">{h.type}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={
-                          h.acceptsAarogyasri
-                            ? 'text-emerald-600 font-medium'
-                            : 'text-muted-foreground'
-                        }
-                      >
-                        {h.acceptsAarogyasri ? 'Yes' : 'No'}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{h.name}</span>
+                        {h.hfrVerified && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
+                            ABDM ✓
+                          </span>
+                        )}
+                      </div>
+                      {h.facilityType && (
+                        <span className="text-xs text-muted-foreground">{h.facilityType}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{h.city}</td>
+                    <td className="px-4 py-3 capitalize text-muted-foreground">{h.type}</td>
+                    <td className="px-4 py-3">
+                      {h.accreditations?.length ? (
+                        <div className="flex flex-wrap gap-1">
+                          {h.accreditations.map((a) => (
+                            <span key={a} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700">
+                              {a}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={
-                          h.offersPalliative
-                            ? 'text-emerald-600 font-medium'
-                            : 'text-muted-foreground'
-                        }
-                      >
-                        {h.offersPalliative ? 'Yes' : 'No'}
-                      </span>
+                      {h.govtSchemes?.length ? (
+                        <div className="flex flex-wrap gap-1">
+                          {h.govtSchemes.map((s) => (
+                            <span key={s} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(h)}>
+                      <Button variant="ghost" size="icon" onClick={() => navigate(`/hospitals/${h._id}/edit`)}>
                         <Pencil className="w-4 h-4" />
                       </Button>
                     </td>
@@ -188,61 +123,6 @@ export function HospitalsPage() {
           </table>
         </CardContent>
       </Card>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Hospital' : 'Add Hospital'}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
-            <div className="space-y-1">
-              <Label>Name</Label>
-              <Input {...register('name')} required minLength={2} maxLength={120} />
-            </div>
-            <div className="space-y-1">
-              <Label>City</Label>
-              <Input {...register('city')} required minLength={2} maxLength={80} />
-            </div>
-            <div className="space-y-1">
-              <Label>Address (optional)</Label>
-              <Input {...register('address')} maxLength={200} />
-            </div>
-            <div className="space-y-1">
-              <Label>Type</Label>
-              <select
-                {...register('type')}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="private">Private</option>
-                <option value="government">Government</option>
-                <option value="trust">Trust</option>
-              </select>
-            </div>
-            <div className="space-y-1">
-              <Label>Tags (comma-separated)</Label>
-              <Input {...register('tags')} placeholder="oncology, surgery" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" {...register('acceptsAarogyasri')} className="h-4 w-4 rounded border-input" />
-                Accepts Aarogyasri
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" {...register('offersPalliative')} className="h-4 w-4 rounded border-input" />
-                Offers Palliative Care
-              </label>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving…' : 'Save'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
