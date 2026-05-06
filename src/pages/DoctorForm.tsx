@@ -36,7 +36,7 @@ type FormValues = {
 const SPECIALTIES   = ['Medical Oncology (DM)', 'Surgical Oncology (MCh)', 'Radiation Oncology (MD)', 'Hematology-Oncology'];
 const DMGS          = ['Breast Cancer', 'Head & Neck', 'Gastrointestinal (GI)', 'Thoracic (Lung)', 'Pediatric Oncology', 'Gynecological Oncology'];
 const DAYS          = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const INSURANCE     = ['PM-JAY', 'Aarogyasri', 'Private Insurance (Cashless)'];
+// const INSURANCE  = ['PM-JAY', 'Aarogyasri', 'Private Insurance (Cashless)']; // not needed per client
 const STATE_COUNCILS = ['Telangana', 'Andhra Pradesh', 'Karnataka', 'Maharashtra', 'Tamil Nadu', 'Delhi', 'Other'];
 
 const EMPTY_AFFILIATION: AffiliationValue = {
@@ -324,7 +324,9 @@ export function DoctorFormPage() {
             <input type="checkbox" {...register('teleConsultation')} className="h-4 w-4 rounded border-input accent-[#1A6B5A]" />
             Tele-Consultation Available
           </label>
+          {/* Insurance / Schemes Accepted — not needed per client
           <CheckboxGroup label="Insurance / Schemes Accepted" options={INSURANCE} name="insuranceAccepted" register={register} />
+          */}
         </Section>
 
         {/* Section 5 — Consent */}
