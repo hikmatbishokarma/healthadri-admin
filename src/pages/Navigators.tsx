@@ -20,7 +20,8 @@ type Hospital = { _id: string; name: string };
 type Navigator = {
   _id: string;
   name: string;
-  phone: string;
+  phone?: string;
+  email?: string;
   hospitalId?: Hospital | null;
   languages?: string[];
 };
@@ -35,7 +36,9 @@ type PatientSummary = {
 
 type FormValues = {
   name: string;
-  phone: string;
+  phone?: string;
+  email?: string;
+  password?: string;
   hospitalId?: string;
   languages?: string;
 };
@@ -100,7 +103,7 @@ export function NavigatorsPage() {
 
   const openAdd = () => {
     setEditing(null);
-    reset({ name: '', phone: '', hospitalId: '', languages: '' });
+    reset({ name: '', phone: '', email: '', password: '', hospitalId: '', languages: '' });
     setOpen(true);
   };
 
@@ -108,7 +111,9 @@ export function NavigatorsPage() {
     setEditing(n);
     reset({
       name: n.name,
-      phone: n.phone,
+      phone: n.phone ?? '',
+      email: n.email ?? '',
+      password: '',
       hospitalId: n.hospitalId?._id ?? '',
       languages: (n.languages ?? []).join(', '),
     });
@@ -116,15 +121,17 @@ export function NavigatorsPage() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    const payload = {
+    const payload: Record<string, unknown> = {
       name: data.name,
-      phone: data.phone,
-      role: 'navigator' as const,
+      role: 'navigator',
       hospitalId: data.hospitalId || undefined,
       languages: data.languages
         ? data.languages.split(',').map((s) => s.trim()).filter(Boolean)
         : [],
     };
+    if (data.phone) payload.phone = data.phone;
+    if (data.email) payload.email = data.email;
+    if (!editing && data.password) payload.password = data.password;
     if (editing) {
       await api.patch(`/users/${editing._id}`, payload);
     } else {
@@ -161,7 +168,7 @@ export function NavigatorsPage() {
               <tr className="text-left">
                 <th className="px-4 py-3 w-8" />
                 <th className="px-4 py-3 font-medium text-muted-foreground">Name</th>
-                <th className="px-4 py-3 font-medium text-muted-foreground">Phone</th>
+                <th className="px-4 py-3 font-medium text-muted-foreground">Email / Phone</th>
                 <th className="px-4 py-3 font-medium text-muted-foreground">Hospital</th>
                 <th className="px-4 py-3 font-medium text-muted-foreground">Languages</th>
                 <th className="px-4 py-3 font-medium text-muted-foreground">Patients</th>
@@ -203,7 +210,9 @@ export function NavigatorsPage() {
                         ) : null}
                       </td>
                       <td className="px-4 py-3 font-medium">{n.name}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{n.phone}</td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {n.email || n.phone || <span className="text-muted-foreground">—</span>}
+                      </td>
                       <td className="px-4 py-3">
                         {n.hospitalId ? n.hospitalId.name : <span className="text-muted-foreground">—</span>}
                       </td>
@@ -307,8 +316,18 @@ export function NavigatorsPage() {
               <Input {...register('name')} required minLength={2} />
             </div>
             <div className="space-y-1">
-              <Label>Phone</Label>
-              <Input {...register('phone')} required placeholder="+91XXXXXXXXXX" />
+              <Label>Email (for web login)</Label>
+              <Input {...register('email')} type="email" placeholder="navigator@hospital.com" />
+            </div>
+            {!editing && (
+              <div className="space-y-1">
+                <Label>Password</Label>
+                <Input {...register('password')} type="password" placeholder="Min 6 characters" minLength={6} />
+              </div>
+            )}
+            <div className="space-y-1">
+              <Label>Phone (optional — for mobile OTP)</Label>
+              <Input {...register('phone')} placeholder="+91XXXXXXXXXX" />
             </div>
             <div className="space-y-1">
               <Label>Hospital (optional)</Label>

@@ -2,7 +2,12 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { type ReactNode } from 'react';
 
-export function ProtectedRoute({ children }: { children: ReactNode }) {
+interface Props {
+  children: ReactNode;
+  allowedRoles?: string[];
+}
+
+export function ProtectedRoute({ children, allowedRoles }: Props) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -15,6 +20,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    const fallback = user.role === 'navigator' ? '/nav/home' : '/';
+    return <Navigate to={fallback} replace />;
   }
 
   return <>{children}</>;

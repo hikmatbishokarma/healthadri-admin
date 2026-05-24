@@ -11,7 +11,8 @@ export type AdminUser = {
   _id: string;
   name: string;
   email: string;
-  role: 'super-admin';
+  phone?: string;
+  role: 'super-admin' | 'navigator';
 };
 
 type AuthContextValue = {
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const res = await api.post('/auth/admin/login', { email, password });
+    const res = await api.post('/auth/web/login', { email, password });
     const { token, user: loggedInUser } = res.data;
     localStorage.setItem('admin_token', token);
     localStorage.setItem('admin_user', JSON.stringify(loggedInUser));
