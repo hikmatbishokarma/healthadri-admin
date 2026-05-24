@@ -94,7 +94,7 @@ function ChangeTypeHeader({ diff, taskType }: { diff: TaskDiff; taskType: string
 }
 
 function TaskTitle({ task }: { task: AiExtractedTask }) {
-  const d = task.extractedData;
+  const d = task.extractedData as Record<string, string>;
   switch (task.taskType) {
     case 'MEDICATION':
       return (
@@ -155,7 +155,7 @@ function TaskTitle({ task }: { task: AiExtractedTask }) {
 export function TaskReviewCard({
   task,
   navigatorId,
-  documentId,
+  documentId: _documentId,
   onTaskUpdated,
   onViewDocument,
 }: TaskReviewCardProps) {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, ShieldAlert, ClipboardList, TrendingUp,
-  AlertTriangle, ChevronRight, Clock, CheckCircle2,
+  ChevronRight, Clock, CheckCircle2,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';

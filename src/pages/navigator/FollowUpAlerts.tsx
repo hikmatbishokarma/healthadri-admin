@@ -58,7 +58,7 @@ function timeAgo(dateStr: string): string {
 // ── Escalation card ───────────────────────────────────────────────────────────
 
 function EscalationCard({
-  escalation, navigatorId, onResolve, onEscalate,
+  escalation, navigatorId: _navigatorId, onResolve, onEscalate,
 }: {
   escalation: Escalation;
   navigatorId: string;
