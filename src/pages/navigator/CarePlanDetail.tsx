@@ -294,7 +294,7 @@ function CollapsibleRow({
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function NavCarePlanDetailPage() {
-  const { patientId } = useParams<{ patientId: string }>();
+  const { patientId, versionId } = useParams<{ patientId: string; versionId?: string }>();
   const { user: _user } = useAuth();
   const navigate = useNavigate();
 
@@ -302,19 +302,25 @@ export function NavCarePlanDetailPage() {
   const [active, setActive]     = useState<{ version: CarePlanVersion; tasks: CarePlanTask[] } | null>(null);
   const [versions, setVersions] = useState<CarePlanVersion[]>([]);
   const [loading, setLoading]   = useState(true);
+  const [showAllVersions, setShowAllVersions] = useState(false);
 
   const [catFilter, setCatFilter]       = useState<CategoryFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [showCompleted, setShowCompleted] = useState(false);
   const [showArchived, setShowArchived]   = useState(false);
 
+  const isHistorical = Boolean(versionId);
+
   const fetchAll = useCallback(async () => {
     if (!patientId) return;
     setLoading(true);
     try {
+      const planEndpoint = versionId
+        ? `/care-plan/version/${versionId}`
+        : `/care-plan/patient/${patientId}/active`;
       const [patRes, actRes, verRes] = await Promise.allSettled([
         api.get(`/users/${patientId}`),
-        api.get(`/care-plan/patient/${patientId}/active`),
+        api.get(planEndpoint),
         api.get(`/care-plan/patient/${patientId}`),
       ]);
       if (patRes.status === 'fulfilled') setPatient(patRes.value.data);
@@ -323,7 +329,7 @@ export function NavCarePlanDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [patientId]);
+  }, [patientId, versionId]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
@@ -378,7 +384,7 @@ export function NavCarePlanDetailPage() {
       {/* ── Patient header ─────────────────────────────────────────────────── */}
       <div className="bg-white border-b border-border flex-shrink-0">
         {/* Back nav */}
-        <div className="px-6 pt-3">
+        <div className="px-6 pt-3 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -386,6 +392,19 @@ export function NavCarePlanDetailPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Patients
           </button>
+          {isHistorical && (
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
+                Historical version — read only
+              </span>
+              <button
+                onClick={() => navigate(`/nav/care-plans/${patientId}`)}
+                className="text-xs text-primary hover:underline font-medium"
+              >
+                View current plan →
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Patient info */}
@@ -695,10 +714,17 @@ export function NavCarePlanDetailPage() {
             <div className="bg-white rounded-lg border border-border p-5">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Prescription History</p>
-                <button className="text-xs text-primary hover:underline">View full history</button>
+                {versions.length > 4 && (
+                  <button
+                    onClick={() => setShowAllVersions(s => !s)}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    {showAllVersions ? 'Show less' : `View all ${versions.length} versions`}
+                  </button>
+                )}
               </div>
               <div className="space-y-3">
-                {versions.slice(0, 4).map((v, i) => (
+                {(showAllVersions ? versions : versions.slice(0, 4)).map((v, i) => (
                   <div key={v._id} className="flex items-start gap-3">
                     <div className="flex flex-col items-center flex-shrink-0">
                       <div className={cn('w-2.5 h-2.5 rounded-full mt-0.5', i === 0 ? 'bg-green-500' : i === 1 ? 'bg-primary/60' : 'bg-muted-foreground/30')} />

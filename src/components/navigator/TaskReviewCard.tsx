@@ -71,11 +71,11 @@ function ConfidenceBadge({ value }: { value: number }) {
   );
 }
 
-function ChangeTypeHeader({ diff, taskType }: { diff: TaskDiff; taskType: string }) {
+function ChangeTypeHeader({ diff, taskType }: { diff: TaskDiff | undefined; taskType: string }) {
   const cfg = TASK_TYPE_CONFIG[taskType as keyof typeof TASK_TYPE_CONFIG] ?? TASK_TYPE_CONFIG.PROCEDURE;
   const Icon = cfg.icon;
 
-  if (diff.changeType === 'CHANGED') {
+  if (!diff || diff.changeType === 'CHANGED') {
     return (
       <div className="flex items-center gap-1.5 text-amber-600 text-sm font-semibold">
         <ArrowUpRight className="w-4 h-4" />
@@ -107,7 +107,7 @@ function TaskTitle({ task }: { task: AiExtractedTask }) {
               {d.duration ? ` for ${d.duration}` : ''}
             </div>
           )}
-          {task.diff.changeType === 'CHANGED' && task.diff.previousValue && (
+          {task.diff?.changeType === 'CHANGED' && task.diff?.previousValue && (
             <div className="text-xs text-amber-600 mt-1 bg-amber-50 px-2 py-1 rounded border border-amber-200">
               Previously: {task.diff.previousValue}
             </div>

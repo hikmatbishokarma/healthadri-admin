@@ -6,6 +6,8 @@ import {
   FlaskConical,
   Calendar,
   Send,
+  ExternalLink,
+  Download,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
@@ -71,39 +73,38 @@ export function ReviewDrawer({
   const [publishing, setPublishing] = useState(false);
   const [docBlobUrl, setDocBlobUrl] = useState<string | null>(null);
   const [docLoading, setDocLoading] = useState(false);
-  const prevDocId = useRef<string | null>(null);
+  const loadedDocId = useRef<string | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
 
   const docId = detail?.batch.document?._id ?? null;
 
+  // Revoke blob only when a different document is opened or on unmount
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
+  }, [docId]);
+
   useEffect(() => {
     if (activeTab !== 'document' || !docId) return;
-    if (prevDocId.current === docId && docBlobUrl) return;
+    if (loadedDocId.current === docId && docBlobUrl) return;
 
-    let objectUrl: string;
     setDocLoading(true);
     api
       .get(`/documents/${docId}/file`, { responseType: 'blob' })
       .then((res) => {
-        objectUrl = URL.createObjectURL(res.data as Blob);
-        prevDocId.current = docId;
-        setDocBlobUrl(objectUrl);
+        const url = URL.createObjectURL(res.data as Blob);
+        blobUrlRef.current = url;
+        loadedDocId.current = docId;
+        setDocBlobUrl(url);
       })
       .catch(() => setDocBlobUrl(null))
       .finally(() => setDocLoading(false));
-
-    return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, docId]);
-
-  // Reset blob when a different batch is opened
-  useEffect(() => {
-    if (docId !== prevDocId.current) {
-      setDocBlobUrl(null);
-      prevDocId.current = null;
-    }
-  }, [docId]);
 
   const batchId = detail?.batch._id ?? '';
   const tasks = detail?.tasks ?? [];
@@ -251,20 +252,61 @@ export function ReviewDrawer({
             )}
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center">
-            {docLoading ? (
-              <div className="text-sm text-muted-foreground">Loading document...</div>
-            ) : docBlobUrl ? (
-              <iframe
-                src={docBlobUrl}
-                className="w-full h-full border-0"
-                title={doc?.fileName ?? 'Document'}
-              />
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                {doc ? 'Failed to load document.' : 'No document available.'}
+          <div className="p-4 flex flex-col gap-3">
+            {/* File info card */}
+            <div className="rounded-lg border border-border bg-slate-50 p-4 flex items-start gap-3">
+              <FileText className="w-8 h-8 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <div className="font-medium text-sm text-foreground truncate">{doc?.fileName ?? 'Document'}</div>
+                <div className="text-xs text-muted-foreground mt-0.5 capitalize">
+                  {doc?.category}{doc?.fileSize ? ` · ${formatBytes(doc.fileSize)}` : ''}
+                </div>
+                {doc && (
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    Uploaded {formatDate(doc.createdAt)}
+                  </div>
+                )}
               </div>
+            </div>
+
+            {/* Actions */}
+            {docLoading ? (
+              <div className="text-sm text-muted-foreground text-center py-4">Preparing document…</div>
+            ) : docBlobUrl ? (
+              <>
+                <a
+                  href={docBlobUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full rounded-lg border-2 border-primary bg-primary text-white text-sm font-semibold py-3 hover:bg-primary/90 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Open in new tab
+                </a>
+                <a
+                  href={docBlobUrl}
+                  download={doc?.fileName ?? 'document'}
+                  className="flex items-center justify-center gap-2 w-full rounded-lg border border-border bg-white text-sm font-medium py-3 hover:bg-muted transition-colors text-foreground"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </a>
+              </>
+            ) : doc ? (
+              <button
+                onClick={() => setActiveTab('document')}
+                className="flex items-center justify-center gap-2 w-full rounded-lg border-2 border-primary bg-primary text-white text-sm font-semibold py-3 hover:bg-primary/90 transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Load document
+              </button>
+            ) : (
+              <div className="text-sm text-muted-foreground text-center py-4">No document available.</div>
             )}
+
+            <p className="text-xs text-muted-foreground text-center">
+              Opens in a new tab so you can review alongside the changes panel.
+            </p>
           </div>
         )}
       </div>
