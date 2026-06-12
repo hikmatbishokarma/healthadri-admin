@@ -53,7 +53,7 @@ export function NavigatorShell() {
   };
 
   return (
-    <div className="flex min-h-screen bg-muted/30">
+    <div className="flex h-screen overflow-hidden bg-muted/30">
       <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border">
         <div className="h-16 px-6 flex items-center border-b border-border">
           <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export function NavigatorShell() {
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0 overflow-hidden">
+      <main className="flex-1 min-w-0 overflow-y-auto">
         <Outlet />
       </main>
     </div>

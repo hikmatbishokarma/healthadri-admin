@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { TablePagination, DEFAULT_PAGE_SIZE } from '@/components/ui/table-pagination';
 
 type Hospital = { _id: string; name: string };
 
@@ -43,6 +44,7 @@ type FormValues = {
   languages?: string;
 };
 
+
 export function NavigatorsPage() {
   const [items, setItems] = useState<Navigator[]>([]);
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -52,6 +54,12 @@ export function NavigatorsPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Navigator | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Navigator | null>(null);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [hospitalFilter, setHospitalFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [total, setTotal] = useState(0);
 
   const {
     register,
@@ -60,18 +68,36 @@ export function NavigatorsPage() {
     formState: { isSubmitting },
   } = useForm<FormValues>();
 
-  const load = async () => {
-    try {
-      const [navRes, hospRes, patRes] = await Promise.all([
-        api.get('/users/navigators'),
-        api.get('/hospitals'),
-        api.get('/users/patients'),
-      ]);
-      setItems(navRes.data);
-      setHospitals(hospRes.data);
+  useEffect(() => {
+    api.get('/hospitals', { params: { limit: 200 } })
+      .then((res) => setHospitals(res.data.data ?? []));
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    const params: Record<string, string> = { page: String(page), limit: String(pageSize) };
+    if (debouncedSearch) params.search = debouncedSearch;
+    if (hospitalFilter) params.hospitalId = hospitalFilter;
+
+    Promise.all([
+      api.get('/users/navigators', { params }),
+      api.get('/users/patients', { params: { limit: '500' } }),
+    ]).then(([navRes, patRes]) => {
+      if (cancelled) return;
+      setItems(navRes.data.data);
+      setTotal(navRes.data.total);
 
       const byNav: Record<string, PatientSummary[]> = {};
-      for (const p of patRes.data) {
+      for (const p of (patRes.data.data ?? patRes.data)) {
         const navId = p.assignedNavigatorId?._id ?? p.assignedNavigatorId;
         if (navId) {
           if (!byNav[navId]) byNav[navId] = [];
@@ -85,12 +111,10 @@ export function NavigatorsPage() {
         }
       }
       setPatientsByNav(byNav);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }).finally(() => { if (!cancelled) setLoading(false); });
 
-  useEffect(() => { load(); }, []);
+    return () => { cancelled = true; };
+  }, [page, pageSize, debouncedSearch, hospitalFilter]);
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => {
@@ -138,14 +162,21 @@ export function NavigatorsPage() {
       await api.post('/users', payload);
     }
     setOpen(false);
-    load();
+    setPage(1);
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     await api.delete(`/users/${deleteTarget._id}`);
     setDeleteTarget(null);
-    load();
+    setPage(1);
+  };
+
+  const pageCount = Math.ceil(total / pageSize);
+
+  const handleHospitalFilter = (val: string) => {
+    setHospitalFilter(val);
+    setPage(1);
   };
 
   return (
@@ -160,6 +191,32 @@ export function NavigatorsPage() {
           </Button>
         }
       />
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[220px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search navigators…"
+            className="pl-9"
+          />
+        </div>
+        <select
+          value={hospitalFilter}
+          onChange={(e) => handleHospitalFilter(e.target.value)}
+          className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="">All hospitals</option>
+          {hospitals.map((h) => (
+            <option key={h._id} value={h._id}>{h.name}</option>
+          ))}
+        </select>
+        <span className="text-sm text-muted-foreground ml-auto">
+          {loading ? '—' : `${total} navigator${total !== 1 ? 's' : ''}`}
+        </span>
+      </div>
 
       <Card>
         <CardContent className="p-0">
@@ -185,7 +242,7 @@ export function NavigatorsPage() {
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
-                    No navigators yet.
+                    {debouncedSearch || hospitalFilter ? 'No navigators match your filters.' : 'No navigators yet.'}
                   </td>
                 </tr>
               ) : (
@@ -303,6 +360,16 @@ export function NavigatorsPage() {
           </table>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      <TablePagination
+        page={page}
+        pageCount={pageCount}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+        disabled={loading}
+      />
 
       {/* Create / Edit dialog */}
       <Dialog open={open} onOpenChange={setOpen}>

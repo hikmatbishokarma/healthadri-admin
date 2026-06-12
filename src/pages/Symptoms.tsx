@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Search } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { TablePagination, DEFAULT_PAGE_SIZE } from '@/components/ui/table-pagination';
 
 type Symptom = {
   _id: string;
@@ -37,6 +38,11 @@ export function SymptomsPage() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Symptom | null>(null);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [total, setTotal] = useState(0);
 
   const {
     register,
@@ -45,16 +51,30 @@ export function SymptomsPage() {
     formState: { isSubmitting },
   } = useForm<FormValues>();
 
-  const load = async () => {
-    try {
-      const res = await api.get('/symptoms');
-      setItems(res.data);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [search]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    const params: Record<string, string> = { page: String(page), limit: String(pageSize) };
+    if (debouncedSearch) params.search = debouncedSearch;
+
+    api.get('/symptoms', { params })
+      .then((res) => {
+        if (cancelled) return;
+        setItems(res.data.data);
+        setTotal(res.data.total);
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [page, pageSize, debouncedSearch]);
 
   const openAdd = () => {
     setEditing(null);
@@ -88,8 +108,10 @@ export function SymptomsPage() {
       await api.post('/symptoms', payload);
     }
     setOpen(false);
-    load();
+    setPage(1);
   };
+
+  const pageCount = Math.ceil(total / pageSize);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -103,6 +125,22 @@ export function SymptomsPage() {
           </Button>
         }
       />
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[220px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search symptoms…"
+            className="pl-9"
+          />
+        </div>
+        <span className="text-sm text-muted-foreground ml-auto">
+          {loading ? '—' : `${total} symptom${total !== 1 ? 's' : ''}`}
+        </span>
+      </div>
 
       <Card>
         <CardContent className="p-0">
@@ -127,7 +165,7 @@ export function SymptomsPage() {
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                    No symptoms yet.
+                    {debouncedSearch ? 'No symptoms match your search.' : 'No symptoms yet.'}
                   </td>
                 </tr>
               ) : (
@@ -154,6 +192,16 @@ export function SymptomsPage() {
           </table>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      <TablePagination
+        page={page}
+        pageCount={pageCount}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+        disabled={loading}
+      />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

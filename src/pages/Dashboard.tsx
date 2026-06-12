@@ -55,12 +55,12 @@ export function DashboardPage() {
         ]);
         if (cancelled) return;
         setCounts({
-          patients:   patients.data?.length ?? 0,
-          navigators: navigators.data?.length ?? 0,
-          hospitals:  hospitals.data?.length ?? 0,
-          doctors:    doctors.data?.length ?? 0,
-          playbooks:  playbooks.data?.length ?? 0,
-          symptoms:   symptoms.data?.length ?? 0,
+          patients:   patients.data?.total ?? 0,
+          navigators: navigators.data?.total ?? 0,
+          hospitals:  hospitals.data?.total ?? 0,
+          doctors:    doctors.data?.total ?? 0,
+          playbooks:  playbooks.data?.total ?? 0,
+          symptoms:   symptoms.data?.total ?? 0,
         });
       } catch {
         if (!cancelled) setCounts({ patients: 0, navigators: 0, hospitals: 0, doctors: 0, playbooks: 0, symptoms: 0 });

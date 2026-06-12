@@ -7,6 +7,7 @@ import {
   Stethoscope,
   BookOpen,
   Activity,
+  Pill,
   ShieldCheck,
   LogOut,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ const NAV = [
   { to: '/doctors', label: 'Doctors', icon: Stethoscope },
   { to: '/playbooks', label: 'Playbooks', icon: BookOpen },
   { to: '/symptoms', label: 'Symptoms', icon: Activity },
+  { to: '/medicines', label: 'Medicines', icon: Pill },
   { to: '/roles', label: 'Roles', icon: ShieldCheck },
 ];
 
@@ -28,7 +30,7 @@ export function AppShell() {
   const { user, signOut } = useAuth();
 
   return (
-    <div className="flex min-h-screen bg-muted/30">
+    <div className="flex h-screen overflow-hidden bg-muted/30">
       <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border">
         <div className="h-16 px-6 flex items-center border-b border-border">
           <div className="flex items-center gap-2">
@@ -39,7 +41,7 @@ export function AppShell() {
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
@@ -77,7 +79,7 @@ export function AppShell() {
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0">
+      <main className="flex-1 min-w-0 overflow-y-auto">
         <Outlet />
       </main>
     </div>

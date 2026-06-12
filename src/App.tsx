@@ -14,6 +14,7 @@ import { DoctorFormPage } from '@/pages/DoctorForm';
 import { PlaybooksPage } from '@/pages/Playbooks';
 import { SymptomsPage } from '@/pages/Symptoms';
 import { RolesPage } from '@/pages/Roles';
+import { MedicinesPage } from '@/pages/Medicines';
 import { NavHomePage } from '@/pages/navigator/Home';
 import { NavPatientsPage } from '@/pages/navigator/Patients';
 import { NavMessagesPage } from '@/pages/navigator/Messages';
@@ -59,6 +60,7 @@ export default function App() {
             <Route path="doctors/:id/edit" element={<DoctorFormPage />} />
             <Route path="playbooks" element={<PlaybooksPage />} />
             <Route path="symptoms" element={<SymptomsPage />} />
+            <Route path="medicines" element={<MedicinesPage />} />
             <Route path="roles" element={<RolesPage />} />
           </Route>
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { UserCheck, AlertCircle, ChevronDown, Pencil } from 'lucide-react';
+import { AlertCircle, ChevronDown, Pencil, Search, UserCheck } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { TablePagination, DEFAULT_PAGE_SIZE } from '@/components/ui/table-pagination';
 
 type Navigator = { _id: string; name: string };
 
@@ -25,6 +27,7 @@ type Patient = {
   hospitalId?: { _id: string; name: string } | null;
 };
 
+
 export function PatientsPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [navigators, setNavigators] = useState<Navigator[]>([]);
@@ -33,20 +36,52 @@ export function PatientsPage() {
   const [selectedNavId, setSelectedNavId] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
-    try {
-      const [pRes, nRes] = await Promise.all([
-        api.get('/users/patients'),
-        api.get('/users/navigators'),
-      ]);
-      setPatients(pRes.data);
-      setNavigators(nRes.data);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [navigatorFilter, setNavigatorFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [total, setTotal] = useState(0);
+  const [unassignedCount, setUnassignedCount] = useState(0);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    api.get('/users/navigators', { params: { limit: '200' } })
+      .then((res) => setNavigators(res.data.data ?? []));
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    const params: Record<string, string> = { page: String(page), limit: String(pageSize) };
+    if (debouncedSearch) params.search = debouncedSearch;
+    if (navigatorFilter) params.navigatorId = navigatorFilter;
+
+    api.get('/users/patients', { params })
+      .then((res) => {
+        if (cancelled) return;
+        setPatients(res.data.data);
+        setTotal(res.data.total);
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [page, pageSize, debouncedSearch, navigatorFilter]);
+
+  useEffect(() => {
+    // Ask the server for the unassigned total directly instead of pulling every
+    // patient down just to count them on the client.
+    api.get('/users/patients', { params: { limit: '1', navigatorId: 'unassigned' } })
+      .then((res) => setUnassignedCount(res.data.total ?? 0))
+      .catch(() => null);
+  }, []);
 
   const openAssign = (patient: Patient) => {
     setAssignTarget(patient);
@@ -73,14 +108,12 @@ export function PatientsPage() {
     }
   };
 
-  const sorted = [...patients].sort((a, b) => {
-    const aAssigned = !!a.assignedNavigatorId;
-    const bAssigned = !!b.assignedNavigatorId;
-    if (aAssigned !== bAssigned) return aAssigned ? 1 : -1;
-    return a.name.localeCompare(b.name);
-  });
+  const pageCount = Math.ceil(total / pageSize);
 
-  const unassigned = patients.filter((p) => !p.assignedNavigatorId).length;
+  const handleNavigatorFilter = (val: string) => {
+    setNavigatorFilter(val);
+    setPage(1);
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -92,22 +125,48 @@ export function PatientsPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
         <SummaryCard
           label="Total Patients"
-          value={loading ? '—' : patients.length}
+          value={loading ? '—' : total}
           icon={<UserCheck className="w-4 h-4" />}
           tint="text-blue-600 bg-blue-50"
         />
         <SummaryCard
           label="Unassigned"
-          value={loading ? '—' : unassigned}
+          value={unassignedCount}
           icon={<AlertCircle className="w-4 h-4" />}
-          tint={unassigned > 0 ? 'text-amber-600 bg-amber-50' : 'text-emerald-600 bg-emerald-50'}
+          tint={unassignedCount > 0 ? 'text-amber-600 bg-amber-50' : 'text-emerald-600 bg-emerald-50'}
         />
         <SummaryCard
           label="Navigators"
-          value={loading ? '—' : navigators.length}
+          value={navigators.length}
           icon={<UserCheck className="w-4 h-4" />}
           tint="text-violet-600 bg-violet-50"
         />
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[220px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search patients…"
+            className="pl-9"
+          />
+        </div>
+        <select
+          value={navigatorFilter}
+          onChange={(e) => handleNavigatorFilter(e.target.value)}
+          className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="">All navigators</option>
+          {navigators.map((n) => (
+            <option key={n._id} value={n._id}>{n.name}</option>
+          ))}
+        </select>
+        <span className="text-sm text-muted-foreground ml-auto">
+          {loading ? '—' : `${total} patient${total !== 1 ? 's' : ''}`}
+        </span>
       </div>
 
       <Card>
@@ -130,14 +189,14 @@ export function PatientsPage() {
                     Loading…
                   </td>
                 </tr>
-              ) : sorted.length === 0 ? (
+              ) : patients.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                    No patients yet.
+                    {debouncedSearch || navigatorFilter ? 'No patients match your filters.' : 'No patients yet.'}
                   </td>
                 </tr>
               ) : (
-                sorted.map((p) => {
+                patients.map((p) => {
                   const isAssigned = !!p.assignedNavigatorId;
                   return (
                     <tr
@@ -204,6 +263,15 @@ export function PatientsPage() {
           </table>
         </CardContent>
       </Card>
+
+      <TablePagination
+        page={page}
+        pageCount={pageCount}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+        disabled={loading}
+      />
 
       <Dialog open={!!assignTarget} onOpenChange={() => setAssignTarget(null)}>
         <DialogContent>

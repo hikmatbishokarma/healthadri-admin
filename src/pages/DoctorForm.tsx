@@ -176,7 +176,7 @@ export function DoctorFormPage() {
   const watched = useWatch({ control });
 
   useEffect(() => {
-    api.get('/hospitals').then((res) => setHospitals(res.data));
+    api.get('/hospitals', { params: { limit: 200 } }).then((res) => setHospitals(res.data.data ?? []));
   }, []);
 
   useEffect(() => {
