@@ -42,9 +42,7 @@ export function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-md">
         <div className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold">HA</span>
-          </div>
+          <img src="/logo.svg" alt="Healthadri logo" className="w-10 h-10 object-contain" />
           <span className="text-xl font-semibold tracking-tight">Healthadri Admin</span>
         </div>
 

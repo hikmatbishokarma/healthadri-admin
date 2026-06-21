@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { APP_NAME } from '@/config/site';
 
-// Renders the brand logo from /public/logo.png. Until that asset is added it
+// Renders the brand logo from /public/logo.svg. If the asset fails to load it
 // falls back to the "HA" tile used elsewhere in the app, so nothing looks broken.
 export function Logo({
   className,
@@ -21,7 +21,7 @@ export function Logo({
         </div>
       ) : (
         <img
-          src="/logo.png"
+          src="/logo.svg"
           alt={`${APP_NAME} logo`}
           className="w-9 h-9 object-contain"
           onError={() => setImgFailed(true)}

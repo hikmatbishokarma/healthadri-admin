@@ -10,11 +10,13 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 167 64% 26%;
+    /* Primary = the Healthadri logo blue (cyan family). Deepened from the raw
+       logo cyan so white text on primary buttons keeps enough contrast. */
+    --primary: 199 78% 43%;
     --primary-foreground: 0 0% 100%;
-    --primary-dark: 167 66% 15%;
-    --primary-darker: 165 67% 12%;
-    /* Brand accents from the Healthadri logo — cyan + yellow. Green stays primary. */
+    --primary-dark: 200 82% 33%;
+    --primary-darker: 202 86% 24%;
+    /* Brand accents from the Healthadri logo — cyan + yellow. */
     --brand: 198 76% 52%;
     --brand-foreground: 0 0% 100%;
     --brand-tint: 200 80% 95%;
@@ -31,7 +33,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 167 64% 26%;
+    --ring: 199 78% 43%;
     --radius: 0.5rem;
   }
 }
