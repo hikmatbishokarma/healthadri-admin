@@ -324,7 +324,7 @@ export function NavCarePlanUpdatesPage() {
                   className={cn(
                     'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors',
                     activeFilter === f.key
-                      ? 'bg-[#0D4035] text-white border-[#0D4035]'
+                      ? 'bg-primary-dark text-white border-primary-dark'
                       : 'bg-white text-muted-foreground border-border hover:border-foreground hover:text-foreground',
                   )}
                 >
@@ -379,7 +379,7 @@ export function NavCarePlanUpdatesPage() {
                     onClick={() => openDrawer(batch._id)}
                     className={cn(
                       'grid grid-cols-[220px_200px_1fr_180px_160px_120px] gap-0 cursor-pointer hover:bg-muted/30 transition-colors',
-                      activeBatchId === batch._id && 'bg-slate-50 border-l-2 border-[#0D4035]',
+                      activeBatchId === batch._id && 'bg-slate-50 border-l-2 border-primary-dark',
                     )}
                   >
                     {/* Patient */}
@@ -472,7 +472,7 @@ export function NavCarePlanUpdatesPage() {
                     <div className="px-4 py-4 flex items-start gap-1" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => openDrawer(batch._id)}
-                        className="h-8 px-3 rounded-md bg-[#0D4035] text-white text-xs font-medium hover:bg-[#0a3329] transition-colors"
+                        className="h-8 px-3 rounded-md bg-primary-dark text-white text-xs font-medium hover:bg-primary-darker transition-colors"
                       >
                         Review
                       </button>
@@ -525,7 +525,7 @@ export function NavCarePlanUpdatesPage() {
                           className={cn(
                             'w-8 h-8 flex items-center justify-center rounded border text-sm',
                             page === p
-                              ? 'bg-[#0D4035] text-white border-[#0D4035]'
+                              ? 'bg-primary-dark text-white border-primary-dark'
                               : 'border-border hover:bg-muted',
                           )}
                         >

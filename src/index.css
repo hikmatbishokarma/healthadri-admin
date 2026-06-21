@@ -12,6 +12,15 @@
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 167 64% 26%;
     --primary-foreground: 0 0% 100%;
+    --primary-dark: 167 66% 15%;
+    --primary-darker: 165 67% 12%;
+    /* Brand accents from the Healthadri logo — cyan + yellow. Green stays primary. */
+    --brand: 198 76% 52%;
+    --brand-foreground: 0 0% 100%;
+    --brand-tint: 200 80% 95%;
+    --brand-warm: 44 100% 48%;
+    --brand-warm-foreground: 222.2 47.4% 11.2%;
+    --brand-warm-tint: 45 92% 94%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;

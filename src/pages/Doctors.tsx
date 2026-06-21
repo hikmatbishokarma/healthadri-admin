@@ -88,7 +88,7 @@ export function DoctorsPage() {
         title="Doctors"
         description="Manage oncologist and specialist profiles."
         action={
-          <Button onClick={() => navigate('/doctors/new')}>
+          <Button onClick={() => navigate('/admin/doctors/new')}>
             <Plus className="w-4 h-4" />
             Add Doctor
           </Button>
@@ -174,7 +174,7 @@ export function DoctorsPage() {
                       {d.affiliations?.[0]?.hospitalId?.name ?? '—'}
                     </td>
                     <td className="px-4 py-3 text-right space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/doctors/${d._id}/edit`)}>
+                      <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/doctors/${d._id}/edit`)}>
                         <Pencil className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(d)}>

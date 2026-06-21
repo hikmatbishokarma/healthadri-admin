@@ -23,13 +23,15 @@ export function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>();
 
-  if (user) return <Navigate to="/" replace />;
+  if (user) {
+    return <Navigate to={user.role === 'navigator' ? '/nav/home' : '/admin'} replace />;
+  }
 
   const onSubmit = async (values: FormValues) => {
     setSubmitError(null);
     try {
-      await signIn(values.email, values.password);
-      navigate('/', { replace: true });
+      const signedIn = await signIn(values.email, values.password);
+      navigate(signedIn.role === 'navigator' ? '/nav/home' : '/admin', { replace: true });
     } catch (err) {
       const e = err as { response?: { data?: { message?: string } } };
       setSubmitError(e.response?.data?.message || 'Invalid credentials');

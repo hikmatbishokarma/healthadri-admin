@@ -315,7 +315,7 @@ export function ReviewDrawer({
       {activeTab === 'review' && (
         <div className="flex-shrink-0 p-4 border-t border-border space-y-2">
           <Button
-            className="w-full bg-[#0D4035] hover:bg-[#0a3329] text-white disabled:opacity-40"
+            className="w-full bg-primary-dark hover:bg-primary-darker text-white disabled:opacity-40"
             disabled={!allActioned || publishing}
             onClick={handlePublish}
           >

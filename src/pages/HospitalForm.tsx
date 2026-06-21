@@ -113,7 +113,7 @@ function CheckboxGroup({
               type="checkbox"
               value={opt}
               {...register(name)}
-              className="h-4 w-4 rounded border-input accent-[#1A6B5A]"
+              className="h-4 w-4 rounded border-input accent-primary"
             />
             {opt}
           </label>
@@ -207,7 +207,7 @@ export function HospitalFormPage() {
     } else {
       await api.post('/hospitals', payload);
     }
-    navigate('/hospitals');
+    navigate('/admin/hospitals');
   };
 
   // Summary helpers
@@ -226,7 +226,7 @@ export function HospitalFormPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/hospitals')}>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/admin/hospitals')}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div>
@@ -282,11 +282,11 @@ export function HospitalFormPage() {
         <Section num={2} title="Oncology Infrastructure" summary={s2 || 'Beds, radiotherapy, diagnostics'} open={openSection ===(2)} onToggle={() => toggle(2)}>
           <div className="flex flex-wrap gap-x-8 gap-y-2">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="checkbox" {...register('hasDedicatedOncologyWing')} className="h-4 w-4 rounded border-input accent-[#1A6B5A]" />
+              <input type="checkbox" {...register('hasDedicatedOncologyWing')} className="h-4 w-4 rounded border-input accent-primary" />
               Dedicated Oncology Wing
             </label>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="checkbox" {...register('coldCapTherapy')} className="h-4 w-4 rounded border-input accent-[#1A6B5A]" />
+              <input type="checkbox" {...register('coldCapTherapy')} className="h-4 w-4 rounded border-input accent-primary" />
               Cold-Cap Therapy Available
             </label>
           </div>
@@ -363,7 +363,7 @@ export function HospitalFormPage() {
         </Section>
 
         <div className="flex justify-end gap-3 pt-2 pb-8">
-          <Button type="button" variant="outline" onClick={() => navigate('/hospitals')}>
+          <Button type="button" variant="outline" onClick={() => navigate('/admin/hospitals')}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>

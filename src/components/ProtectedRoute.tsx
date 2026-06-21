@@ -23,7 +23,7 @@ export function ProtectedRoute({ children, allowedRoles }: Props) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    const fallback = user.role === 'navigator' ? '/nav/home' : '/';
+    const fallback = user.role === 'navigator' ? '/nav/home' : '/admin';
     return <Navigate to={fallback} replace />;
   }
 

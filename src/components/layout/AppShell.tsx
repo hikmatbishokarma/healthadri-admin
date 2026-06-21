@@ -15,15 +15,15 @@ import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
 const NAV = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/patients', label: 'Patients', icon: UserCheck },
-  { to: '/navigators', label: 'Navigators', icon: Users },
-  { to: '/hospitals', label: 'Hospitals', icon: Building2 },
-  { to: '/doctors', label: 'Doctors', icon: Stethoscope },
-  { to: '/playbooks', label: 'Playbooks', icon: BookOpen },
-  { to: '/symptoms', label: 'Symptoms', icon: Activity },
-  { to: '/medicines', label: 'Medicines', icon: Pill },
-  { to: '/roles', label: 'Roles', icon: ShieldCheck },
+  { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/admin/patients', label: 'Patients', icon: UserCheck },
+  { to: '/admin/navigators', label: 'Navigators', icon: Users },
+  { to: '/admin/hospitals', label: 'Hospitals', icon: Building2 },
+  { to: '/admin/doctors', label: 'Doctors', icon: Stethoscope },
+  { to: '/admin/playbooks', label: 'Playbooks', icon: BookOpen },
+  { to: '/admin/symptoms', label: 'Symptoms', icon: Activity },
+  { to: '/admin/medicines', label: 'Medicines', icon: Pill },
+  { to: '/admin/roles', label: 'Roles', icon: ShieldCheck },
 ];
 
 export function AppShell() {
