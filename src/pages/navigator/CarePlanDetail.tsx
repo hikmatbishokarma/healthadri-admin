@@ -496,7 +496,7 @@ export function NavCarePlanDetailPage() {
                 onClick={() => setCatFilter(id)}
                 className={cn(
                   'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                  catFilter === id ? 'bg-[#0D4035] text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  catFilter === id ? 'bg-primary-dark text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 {label}
@@ -530,7 +530,7 @@ export function NavCarePlanDetailPage() {
           {allTasks.length > 0 && (
             <div className="flex items-center gap-3 mb-4">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Care Plan Timeline</span>
-              <div className="flex items-center gap-1.5 bg-[#0D4035] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+              <div className="flex items-center gap-1.5 bg-primary-dark text-white text-xs font-semibold px-2.5 py-1 rounded-full">
                 <span>TODAY</span>
               </div>
               <span className="text-sm text-muted-foreground">{todayLabel()}</span>

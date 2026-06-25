@@ -92,7 +92,7 @@ function CheckboxGroup({
       <div className="flex flex-wrap gap-x-6 gap-y-2 pt-1">
         {options.map((opt) => (
           <label key={opt} className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" value={opt} {...register(name as keyof FormValues)} className="h-4 w-4 rounded border-input accent-[#1A6B5A]" />
+            <input type="checkbox" value={opt} {...register(name as keyof FormValues)} className="h-4 w-4 rounded border-input accent-primary" />
             {opt}
           </label>
         ))}
@@ -130,7 +130,7 @@ function AffiliationBlock({
         <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1">
           {DAYS.map((d) => (
             <label key={d} className="flex items-center gap-1.5 text-sm cursor-pointer">
-              <input type="checkbox" value={d} {...register(`affiliations.${index}.consultationDays`)} className="h-4 w-4 rounded border-input accent-[#1A6B5A]" />
+              <input type="checkbox" value={d} {...register(`affiliations.${index}.consultationDays`)} className="h-4 w-4 rounded border-input accent-primary" />
               {d}
             </label>
           ))}
@@ -221,7 +221,7 @@ export function DoctorFormPage() {
     } else {
       await api.post('/doctors', payload);
     }
-    navigate('/doctors');
+    navigate('/admin/doctors');
   };
 
   // Summary helpers
@@ -235,7 +235,7 @@ export function DoctorFormPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/doctors')}>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/admin/doctors')}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div>
@@ -293,7 +293,7 @@ export function DoctorFormPage() {
             <div className="flex flex-col gap-2 pt-1">
               {SPECIALTIES.map((s) => (
                 <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="radio" value={s} {...register('primarySpecialty')} className="h-4 w-4 border-input accent-[#1A6B5A]" />
+                  <input type="radio" value={s} {...register('primarySpecialty')} className="h-4 w-4 border-input accent-primary" />
                   {s}
                 </label>
               ))}
@@ -321,7 +321,7 @@ export function DoctorFormPage() {
         {/* Section 4 — Patient Support */}
         <Section num={4} title="Patient Support & Accessibility" summary={s4 || 'Tele-consult, insurance'} open={openSection === 4} onToggle={() => toggle(4)}>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" {...register('teleConsultation')} className="h-4 w-4 rounded border-input accent-[#1A6B5A]" />
+            <input type="checkbox" {...register('teleConsultation')} className="h-4 w-4 rounded border-input accent-primary" />
             Tele-Consultation Available
           </label>
           {/* Insurance / Schemes Accepted — not needed per client
@@ -332,7 +332,7 @@ export function DoctorFormPage() {
         {/* Section 5 — Consent */}
         <Section num={5} title="Assignment & Privacy Consent" summary={s5} open={openSection === 5} onToggle={() => toggle(5)}>
           <label className="flex items-start gap-3 text-sm cursor-pointer">
-            <input type="checkbox" {...register('dataConsent')} className="mt-0.5 h-4 w-4 rounded border-input accent-[#1A6B5A]" />
+            <input type="checkbox" {...register('dataConsent')} className="mt-0.5 h-4 w-4 rounded border-input accent-primary" />
             <span className="text-muted-foreground leading-relaxed">
               I agree to be listed in the directory and understand that patients can request to share their
               treatment records with my profile based on ABDM consent protocols.
@@ -341,7 +341,7 @@ export function DoctorFormPage() {
         </Section>
 
         <div className="flex justify-end gap-3 pt-2 pb-8">
-          <Button type="button" variant="outline" onClick={() => navigate('/doctors')}>
+          <Button type="button" variant="outline" onClick={() => navigate('/admin/doctors')}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>

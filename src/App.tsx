@@ -3,6 +3,14 @@ import { AuthProvider, useAuth } from '@/lib/auth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
 import { NavigatorShell } from '@/components/layout/NavigatorShell';
+import { PublicLayout } from '@/components/layout/PublicLayout';
+import { HomePage } from '@/pages/public/HomePage';
+import { AboutPage } from '@/pages/public/AboutPage';
+import { PrivacyPage } from '@/pages/public/PrivacyPage';
+import { TermsPage } from '@/pages/public/TermsPage';
+import { DisclaimerPage } from '@/pages/public/DisclaimerPage';
+import { AccountDeletionPage } from '@/pages/public/AccountDeletionPage';
+import { ContactPage } from '@/pages/public/ContactPage';
 import { LoginPage } from '@/pages/Login';
 import { DashboardPage } from '@/pages/Dashboard';
 import { PatientsPage } from '@/pages/Patients';
@@ -31,6 +39,7 @@ import { NavAdherenceMonitoringPage } from '@/pages/navigator/AdherenceMonitorin
 function RootRedirect() {
   const { user } = useAuth();
   if (user?.role === 'navigator') return <Navigate to="/nav/home" replace />;
+  if (user?.role === 'super-admin') return <Navigate to="/admin" replace />;
   return <Navigate to="/" replace />;
 }
 
@@ -39,10 +48,22 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public marketing + legal pages */}
+          <Route element={<PublicLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="privacy" element={<PrivacyPage />} />
+            <Route path="terms" element={<TermsPage />} />
+            <Route path="disclaimer" element={<DisclaimerPage />} />
+            <Route path="account-deletion" element={<AccountDeletionPage />} />
+            <Route path="contact" element={<ContactPage />} />
+          </Route>
+
           <Route path="/login" element={<LoginPage />} />
 
           {/* Super-admin routes */}
           <Route
+            path="admin"
             element={
               <ProtectedRoute allowedRoles={['super-admin']}>
                 <AppShell />

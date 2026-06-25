@@ -71,7 +71,7 @@ export function HospitalsPage() {
         title="Hospitals"
         description="Manage hospital and cancer centre records."
         action={
-          <Button onClick={() => navigate('/hospitals/new')}>
+          <Button onClick={() => navigate('/admin/hospitals/new')}>
             <Plus className="w-4 h-4" />
             Add Hospital
           </Button>
@@ -175,7 +175,7 @@ export function HospitalsPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/hospitals/${h._id}/edit`)}>
+                      <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/hospitals/${h._id}/edit`)}>
                         <Pencil className="w-4 h-4" />
                       </Button>
                     </td>

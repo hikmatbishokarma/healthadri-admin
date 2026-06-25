@@ -18,7 +18,7 @@ export type AdminUser = {
 type AuthContextValue = {
   user: AdminUser | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<AdminUser>;
   signOut: () => void;
 };
 
@@ -47,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('admin_token', token);
     localStorage.setItem('admin_user', JSON.stringify(loggedInUser));
     setUser(loggedInUser);
+    return loggedInUser as AdminUser;
   };
 
   const signOut = () => {

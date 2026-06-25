@@ -18,6 +18,18 @@ export default {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          dark: 'hsl(var(--primary-dark))',
+          darker: 'hsl(var(--primary-darker))',
+        },
+        brand: {
+          DEFAULT: 'hsl(var(--brand))',
+          foreground: 'hsl(var(--brand-foreground))',
+          tint: 'hsl(var(--brand-tint))',
+        },
+        'brand-warm': {
+          DEFAULT: 'hsl(var(--brand-warm))',
+          foreground: 'hsl(var(--brand-warm-foreground))',
+          tint: 'hsl(var(--brand-warm-tint))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
