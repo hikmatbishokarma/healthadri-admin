@@ -8,7 +8,6 @@ import {
   Heart,
   HeartHandshake,
   MapPin,
-  Play,
   Settings,
   Sparkles,
   Stethoscope,
@@ -19,9 +18,10 @@ import { Button } from '@/components/ui/button';
 import {
   Blob,
   CtaBand,
-  DotPattern,
   Eyebrow,
+  GooglePlayIcon,
   IconTile,
+  Illustration,
   PhoneFrame,
   SectionTitle,
 } from '@/components/public/marketing';
@@ -87,7 +87,6 @@ export function HomePage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-primary/[0.07] via-background to-background">
         <Blob className="absolute -left-24 -top-24 h-72 w-72 bg-primary/15" />
         <Blob className="absolute right-0 top-40 h-80 w-80 bg-brand/15" />
-        <DotPattern className="absolute left-1/3 top-12 hidden h-20 w-28 text-primary/15 lg:block" />
 
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
           <div>
@@ -103,7 +102,7 @@ export function HomePage() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
                 <Button size="lg">
-                  <Play className="h-4 w-4" />
+                  <GooglePlayIcon className="h-4 w-4" />
                   Get the app on Google Play
                 </Button>
               </a>
@@ -124,11 +123,11 @@ export function HomePage() {
             </div>
           </div>
 
-          {/* Phone with floating accent cards */}
-          <div className="relative mx-auto">
+          {/* Phone with floating accent cards straddling the edges */}
+          <div className="relative mx-auto w-[240px]">
             <PhoneFrame />
             <FloatingCard
-              className="-left-4 top-20 hidden lg:flex"
+              className="left-0 top-16 hidden w-44 -translate-x-1/2 lg:flex"
               icon={CheckCircle2}
               tint="bg-emerald-100"
               color="text-emerald-600"
@@ -136,7 +135,7 @@ export function HomePage() {
               sub="by your Care Guide"
             />
             <FloatingCard
-              className="-right-2 bottom-28 hidden lg:flex"
+              className="bottom-24 right-0 hidden w-44 translate-x-1/2 lg:flex"
               icon={Bell}
               tint="bg-primary/10"
               color="text-primary"
@@ -155,14 +154,11 @@ export function HomePage() {
           subtitle="The app does the watching. A real person does the deciding."
         />
         <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {STEPS.map((step, i) => (
+          {STEPS.map((step) => (
             <div
               key={step.title}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+              className="group rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
             >
-              <span className="pointer-events-none absolute -right-1 -top-3 text-6xl font-black text-primary/5">
-                {`0${i + 1}`}
-              </span>
               <IconTile icon={step.icon} className="h-12 w-12" />
               <h3 className="mt-4 font-semibold text-foreground">{step.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
@@ -171,35 +167,18 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* AI + human band */}
+      {/* AI + human band — full infographic on desktop, live text band on mobile */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="relative grid items-center gap-8 overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/[0.07] to-brand/[0.06] p-8 md:grid-cols-2 md:p-12">
-          <Blob className="absolute -right-10 -bottom-10 h-48 w-48 bg-primary/10" />
-          <div className="relative">
-            <AiCareScene className="mx-auto h-44 w-full max-w-sm" />
-          </div>
-          <div className="relative">
-            <Eyebrow icon={Sparkles}>AI, kept in check</Eyebrow>
-            <h2 className="mt-4 text-2xl font-bold leading-snug text-foreground md:text-3xl">
-              AI keeps watch every day. A trained Care Guide makes every decision.
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Our AI reviews daily check-ins and reads uploaded reports to flag risks and pull out
-              medicines and appointments — but it never acts alone. A Care Guide reviews and approves
-              before anything reaches you.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {AI_CHIPS.map((chip) => (
-                <span
-                  key={chip}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground"
-                >
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  {chip}
-                </span>
-              ))}
-            </div>
-          </div>
+        <div className="hidden md:block">
+          <Illustration
+            src="/illustrations/ai-care-guide.png"
+            alt="How Healthadri's AI assists while a Care Guide makes every decision"
+            className="mx-auto w-full max-w-4xl"
+            fallback={<AiBand />}
+          />
+        </div>
+        <div className="md:hidden">
+          <AiBand />
         </div>
       </section>
 
@@ -272,13 +251,46 @@ export function HomePage() {
         >
           <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90">
-              <Play className="h-4 w-4" />
+              <GooglePlayIcon className="h-4 w-4" />
               Get the app on Google Play
             </Button>
           </a>
         </CtaBand>
       </div>
     </>
+  );
+}
+
+function AiBand() {
+  return (
+    <div className="relative grid items-center gap-8 overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/[0.07] to-brand/[0.06] p-8 md:grid-cols-2 md:p-12">
+      <Blob className="absolute -bottom-10 -right-10 h-48 w-48 bg-primary/10" />
+      <div className="relative">
+        <AiCareScene className="mx-auto h-44 w-full max-w-sm" />
+      </div>
+      <div className="relative">
+        <Eyebrow icon={Sparkles}>AI, kept in check</Eyebrow>
+        <h2 className="mt-4 text-2xl font-bold leading-snug text-foreground md:text-3xl">
+          AI keeps watch every day. A trained Care Guide makes every decision.
+        </h2>
+        <p className="mt-3 text-muted-foreground">
+          Our AI reviews daily check-ins and reads uploaded reports to flag risks and pull out
+          medicines and appointments — but it never acts alone. A Care Guide reviews and approves
+          before anything reaches you.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {AI_CHIPS.map((chip) => (
+            <span
+              key={chip}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground"
+            >
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              {chip}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

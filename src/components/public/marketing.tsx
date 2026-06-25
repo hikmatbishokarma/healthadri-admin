@@ -20,6 +20,18 @@ import { cn } from '@/lib/utils';
 
 type IconType = ComponentType<{ className?: string }>;
 
+// Google Play mark (colorful folded play triangle) for app-download CTAs.
+export function GooglePlayIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <polygon points="3,3 3,12 13.5,12" fill="#34A853" />
+      <polygon points="3,12 3,21 13.5,12" fill="#4285F4" />
+      <polygon points="3,3 13.5,12 21,12" fill="#EA4335" />
+      <polygon points="3,21 21,12 13.5,12" fill="#FBBC04" />
+    </svg>
+  );
+}
+
 // Soft blurred blob — the recurring "background feel" behind hero art and
 // page-header icons in the design.
 export function Blob({ className }: { className?: string }) {
@@ -69,7 +81,6 @@ export function HeaderArt({ icon: Icon }: { icon: IconType }) {
   return (
     <div className="relative hidden h-20 w-20 shrink-0 sm:block">
       <Blob className="absolute -right-3 -top-3 h-24 w-24 bg-primary/15" />
-      <DotPattern className="absolute -bottom-3 -left-5 h-10 w-12 text-primary/25" />
       <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10">
         <Icon className="h-9 w-9 text-primary" />
       </div>
@@ -209,8 +220,6 @@ export function PhoneFrame({ className }: { className?: string }) {
   return (
     <div className={cn('relative mx-auto w-[240px] max-w-full', className)}>
       <Blob className="absolute -inset-6 -z-10 bg-primary/15" />
-      <DotPattern className="absolute -bottom-4 -right-6 -z-10 h-14 w-16 text-primary/25" />
-      <DotPattern className="absolute -left-6 -top-2 -z-10 h-12 w-12 text-primary/20" />
       <div className="rounded-[2.5rem] border-[10px] border-slate-900 bg-slate-900 shadow-2xl">
         <div className="relative overflow-hidden rounded-[1.8rem] bg-background">
           <div className="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-slate-900" />

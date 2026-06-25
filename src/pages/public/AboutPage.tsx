@@ -1,22 +1,26 @@
 import {
+  ArrowRight,
+  Bell,
   Bot,
   ClipboardList,
+  FileText,
   Heart,
   HeartHandshake,
-  Play,
+  MessageSquare,
   Settings,
   ShieldCheck,
   Sparkles,
   Stethoscope,
   User,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Blob,
   CtaBand,
-  DotPattern,
   Eyebrow,
   FlowArrow,
+  GooglePlayIcon,
   IconTile,
   Illustration,
   SectionTitle,
@@ -54,6 +58,60 @@ const ROLES = [
   },
 ];
 
+const HITL = [
+  {
+    icon: Bell,
+    tint: 'bg-amber-100',
+    color: 'text-amber-600',
+    title: 'AI flags an alert',
+    sub: 'Risk or important change detected.',
+  },
+  {
+    icon: Stethoscope,
+    tint: 'bg-primary/10',
+    color: 'text-primary',
+    title: 'Care Guide reviews',
+    sub: 'Checks context, history and guidelines.',
+  },
+  {
+    icon: ShieldCheck,
+    tint: 'bg-emerald-100',
+    color: 'text-emerald-600',
+    title: 'Human decides',
+    sub: 'Approves, edits or adds instructions.',
+  },
+  {
+    icon: Users,
+    tint: 'bg-primary/10',
+    color: 'text-primary',
+    title: 'You & caregiver informed',
+    sub: 'Reminders and guidance shared.',
+  },
+];
+
+const AI_WORKS = [
+  {
+    icon: Bot,
+    lead: 'Watches daily check-ins',
+    rest: ' and raises an alert the moment a symptom crosses a safe limit — so nothing is missed overnight or on a busy day.',
+  },
+  {
+    icon: FileText,
+    lead: 'Reads uploaded prescriptions and discharge reports',
+    rest: ', pulling out medicines, lab tests, and appointments — each flagged with how confident it is.',
+  },
+  {
+    icon: MessageSquare,
+    lead: 'Explains confusing medical terms',
+    rest: ' in plain, calm language whenever a patient or caregiver asks.',
+  },
+  {
+    icon: ShieldCheck,
+    lead: 'What our AI will never do',
+    rest: ': diagnose, prescribe, or suggest treatment or dosage. Those decisions always belong to qualified humans.',
+  },
+];
+
 export function AboutPage() {
   return (
     <>
@@ -74,7 +132,6 @@ export function AboutPage() {
           </div>
           <div className="relative">
             <Blob className="absolute -right-6 -top-6 -z-10 h-48 w-48 bg-primary/15" />
-            <DotPattern className="absolute -bottom-4 -left-4 -z-10 h-12 w-16 text-primary/25" />
             <Illustration
               src="/about-care.jpg"
               alt="A caregiver supporting a cancer patient"
@@ -166,50 +223,80 @@ export function AboutPage() {
           </div>
         </div>
 
-        {/* How our AI works */}
-        <div className="mt-12 grid items-center gap-8 rounded-3xl border border-violet-100 bg-violet-50 p-8 md:grid-cols-[auto_1fr] md:p-12">
-          <RobotMascot className="mx-auto h-32 w-auto" />
+        {/* How our AI works — timeline (live text) + separate illustration image */}
+        <div className="mt-10 grid items-center gap-8 rounded-3xl border border-violet-100 bg-violet-50 p-6 md:grid-cols-2">
           <div>
             <Eyebrow icon={Sparkles} className="border-violet-200 bg-violet-100/60 text-violet-700">
               Under the hood
             </Eyebrow>
-            <h2 className="mt-4 text-2xl font-bold text-foreground">How our AI works</h2>
-            <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-muted-foreground">
-              <li>
-                <strong className="font-semibold text-foreground">Watches daily check-ins</strong> and
-                raises an alert the moment a symptom crosses a safe limit — so nothing is missed
-                overnight or on a busy day.
-              </li>
-              <li>
-                <strong className="font-semibold text-foreground">Reads uploaded prescriptions and
-                discharge reports</strong>, pulling out medicines, lab tests, and appointments — each
-                flagged with how confident it is.
-              </li>
-              <li>
-                <strong className="font-semibold text-foreground">Explains confusing medical terms</strong>{' '}
-                in plain, calm language whenever a patient or caregiver asks.
-              </li>
-            </ul>
-            <p className="mt-4 text-sm text-foreground/80">
-              What our AI will <strong>never</strong> do: diagnose, prescribe, or suggest treatment or
-              dosage. Those decisions always belong to qualified humans.
-            </p>
+            <h2 className="mt-3 text-2xl font-bold text-foreground">How our AI works</h2>
+            <div className="mt-4">
+              {AI_WORKS.map((item, i) => (
+                <div key={item.lead} className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-100">
+                      <item.icon className="h-5 w-5 text-violet-600" />
+                    </div>
+                    {i < AI_WORKS.length - 1 ? (
+                      <div className="my-0.5 w-px flex-1 bg-violet-200" />
+                    ) : null}
+                  </div>
+                  <p className="pb-3 pt-1 text-sm leading-relaxed text-muted-foreground">
+                    <strong className="font-semibold text-foreground">{item.lead}</strong>
+                    {item.rest}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
+          <Illustration
+            src="/illustrations/ai-flow.png"
+            alt="An AI assistant reading check-ins, prescriptions and lab reports"
+            className="mx-auto w-full max-w-md"
+            fallback={<RobotMascot className="mx-auto h-40 w-auto" />}
+          />
         </div>
 
-        {/* Human in the loop */}
-        <div className="mt-6 rounded-3xl border border-amber-100 bg-amber-50 p-8 md:p-12">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-100">
-              <ShieldCheck className="h-5 w-5 text-amber-600" />
+        {/* Human in the loop — text left + live process flow right, in one row */}
+        <div className="mt-6 rounded-3xl border border-amber-100 bg-amber-50 p-6">
+          <div className="grid gap-6 lg:grid-cols-[0.85fr_2.15fr] lg:items-center">
+            <div>
+              <Eyebrow icon={ShieldCheck} className="border-amber-200 bg-amber-100/60 text-amber-700">
+                Human in the loop
+              </Eyebrow>
+              <h2 className="mt-3 text-2xl font-bold text-foreground">Human in the loop</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                AI helps us catch problems faster and explain things more clearly — but every
+                important decision passes through a human Care Guide. Patients are never left talking
+                to a machine when it matters.
+              </p>
             </div>
-            <h2 className="text-2xl font-bold text-foreground">Human in the loop</h2>
+
+            <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr]">
+              {HITL.map((step, i) => (
+                <div key={step.title} className="contents">
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-full ${step.tint}`}>
+                      <step.icon className={`h-5 w-5 ${step.color}`} />
+                    </div>
+                    <h3 className="mt-2 text-sm font-semibold text-foreground">{step.title}</h3>
+                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{step.sub}</p>
+                  </div>
+                  {i < HITL.length - 1 ? (
+                    <div className="hidden items-center justify-center pt-6 text-amber-400 lg:flex">
+                      <ArrowRight className="h-5 w-5" />
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
           </div>
-          <p className="mt-4 max-w-3xl text-muted-foreground">
-            AI helps us catch problems faster and explain things more clearly — but every important
-            decision passes through a human Care Guide. Patients are never left talking to a machine
-            when it matters.
-          </p>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-2xl border border-amber-100 bg-white/70 px-5 py-3 text-center">
+            <Heart className="h-5 w-5 text-amber-500" />
+            <span className="font-semibold text-foreground">AI assists. Humans decide.</span>
+            <span className="text-muted-foreground">That's our promise.</span>
+          </div>
         </div>
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
@@ -224,7 +311,7 @@ export function AboutPage() {
       >
         <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
           <Button size="lg" className="bg-white text-primary hover:bg-white/90">
-            <Play className="h-4 w-4" />
+            <GooglePlayIcon className="h-4 w-4" />
             Get the app on Google Play
           </Button>
         </a>

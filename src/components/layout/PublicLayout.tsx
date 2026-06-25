@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { type ComponentType } from 'react';
-import { Heart, Menu, Play, X } from 'lucide-react';
+import { Heart, Menu, X } from 'lucide-react';
 import { Logo } from '@/components/public/Logo';
+import { GooglePlayIcon } from '@/components/public/marketing';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -112,7 +113,7 @@ export function PublicLayout() {
               className="hidden md:inline-flex"
             >
               <Button size="sm">
-                <Play className="h-4 w-4" />
+                <GooglePlayIcon className="h-4 w-4" />
                 Get the app
               </Button>
             </a>
@@ -155,7 +156,7 @@ export function PublicLayout() {
               className="block px-3 py-2"
             >
               <Button size="sm" className="w-full">
-                <Play className="h-4 w-4" />
+                <GooglePlayIcon className="h-4 w-4" />
                 Get the app
               </Button>
             </a>
