@@ -13,6 +13,14 @@ export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com
 // Shown as the "Last updated" line on legal pages.
 export const LEGAL_LAST_UPDATED = 'June 21, 2026';
 
+// Marketing copy + contact details reused across public pages.
+export const APP_HERO_TITLE = 'Daily cancer care that never sleeps.';
+export const APP_HERO_SUBTITLE =
+  'AI watches for warning signs every day. A real Care Guide is always the one who decides and reaches out.';
+export const BRAND_PROMISE = 'AI assists. Humans decide.';
+export const BUSINESS_HOURS = 'Mon – Fri · 9:00 AM – 6:00 PM (IST)';
+export const SERVICE_REGION = 'Telangana and Andhra Pradesh, India';
+
 export const LEGAL_LINKS = [
   { to: '/privacy', label: 'Privacy Policy' },
   { to: '/terms', label: 'Terms of Service' },
