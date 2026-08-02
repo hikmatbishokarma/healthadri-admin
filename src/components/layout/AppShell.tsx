@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/public/Logo';
 
 const NAV = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -33,12 +34,7 @@ export function AppShell() {
     <div className="flex h-screen overflow-hidden bg-muted/30">
       <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border">
         <div className="h-16 px-6 flex items-center border-b border-border">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">HA</span>
-            </div>
-            <span className="font-semibold text-foreground">Healthadri</span>
-          </div>
+          <Logo />
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">

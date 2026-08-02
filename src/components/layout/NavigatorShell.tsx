@@ -15,6 +15,7 @@ import {
 import { useAuth } from '@/lib/auth';
 import { connectNavigatorSocket, disconnectNavigatorSocket } from '@/lib/socket';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/public/Logo';
 
 const NAV = [
   { to: '/nav/home',              label: 'Dashboard',          icon: LayoutDashboard },
@@ -57,9 +58,7 @@ export function NavigatorShell() {
       <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border">
         <div className="h-16 px-6 flex items-center border-b border-border">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">HA</span>
-            </div>
+            <Logo showName={false} />
             <div>
               <span className="font-semibold text-foreground block leading-tight">Healthadri</span>
               <span className="text-xs text-muted-foreground">Navigator</span>

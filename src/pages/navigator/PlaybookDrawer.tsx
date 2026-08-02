@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
-import { X, CheckCircle, Circle } from 'lucide-react';
+import { X, CheckCircle, Circle, Phone, Building2, Stethoscope, HeartHandshake } from 'lucide-react';
 import { api } from '@/lib/api';
-
-interface PlaybookStep {
-  step: number;
-  action: string;
-  completed?: boolean;
-}
 
 interface PlaybookData {
   patient: {
@@ -15,17 +9,32 @@ interface PlaybookData {
     cancerType: string;
     cancerStage: string;
     patientCode: string;
+    phone?: string;
+    emergencyContactPhone?: string;
+    caregiverName?: string;
+    caregiverPhone?: string;
+    caregiverRelationship?: string;
+    hospitalName?: string;
+    hospitalId?: { name?: string; city?: string } | null;
+    doctorName?: string;
   };
-  latestAlert: {
+  alert: {
     type: string;
     severity: string;
     reason: string;
   } | null;
-  triggeredPlaybook: {
+  playbook: {
     title: string;
-    steps: PlaybookStep[];
+    steps: string[];
+    autoCompletedCount: number;
   } | null;
-  otherPlaybooks: Array<{ title: string }>;
+  otherActive: Array<{
+    patientId: string;
+    patientName: string;
+    severity: string;
+    type: string;
+    title: string;
+  }>;
 }
 
 interface Props {
@@ -48,6 +57,8 @@ export function PlaybookDrawer({ patientId, onClose }: Props) {
       .then((r) => setData(r.data))
       .finally(() => setLoading(false));
   }, [patientId]);
+
+  const hospitalLabel = data?.patient.hospitalId?.name || data?.patient.hospitalName;
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -81,51 +92,101 @@ export function PlaybookDrawer({ patientId, onClose }: Props) {
               <div>
                 <p className="font-semibold text-foreground">{data.patient.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {data.patient.cancerType} · Stage {data.patient.cancerStage}
+                  {data.patient.cancerType}
+                  {data.patient.cancerStage && ` · ${data.patient.cancerStage}`}
                 </p>
                 <p className="text-xs text-muted-foreground">{data.patient.patientCode}</p>
               </div>
             </div>
 
+            {/* Contact & care team */}
+            <div className="rounded-lg border border-border divide-y divide-border">
+              {data.patient.phone && (
+                <div className="flex items-center gap-2.5 p-2.5">
+                  <Phone className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs text-foreground">{data.patient.phone}</p>
+                </div>
+              )}
+              {hospitalLabel && (
+                <div className="flex items-center gap-2.5 p-2.5">
+                  <Building2 className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs text-foreground">{hospitalLabel}</p>
+                </div>
+              )}
+              {data.patient.doctorName && (
+                <div className="flex items-center gap-2.5 p-2.5">
+                  <Stethoscope className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs text-foreground">Dr. {data.patient.doctorName}</p>
+                </div>
+              )}
+              {data.patient.caregiverName && (
+                <div className="flex items-center gap-2.5 p-2.5">
+                  <HeartHandshake className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs text-foreground">
+                    {data.patient.caregiverName}
+                    {data.patient.caregiverRelationship && ` (${data.patient.caregiverRelationship})`}
+                    {data.patient.caregiverPhone && ` · ${data.patient.caregiverPhone}`}
+                  </p>
+                </div>
+              )}
+              {data.patient.emergencyContactPhone && (
+                <div className="flex items-center gap-2.5 p-2.5">
+                  <Phone className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                  <p className="text-xs text-foreground">
+                    Emergency contact · {data.patient.emergencyContactPhone}
+                  </p>
+                </div>
+              )}
+              {!data.patient.phone && !hospitalLabel && !data.patient.doctorName &&
+                !data.patient.caregiverName && !data.patient.emergencyContactPhone && (
+                <p className="text-xs text-muted-foreground p-2.5">No contact details on file yet.</p>
+              )}
+            </div>
+
             {/* Latest alert */}
-            {data.latestAlert && (
+            {data.alert && (
               <div className="rounded-lg border border-border p-3 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="text-xs font-semibold text-foreground">Latest Alert</p>
-                  <span className={`text-xs px-2 py-0.5 rounded font-medium ${SEVERITY_COLOR[data.latestAlert.severity] ?? ''}`}>
-                    {data.latestAlert.severity}
+                  <span className={`text-xs px-2 py-0.5 rounded font-medium ${SEVERITY_COLOR[data.alert.severity] ?? ''}`}>
+                    {data.alert.severity}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">{data.latestAlert.reason}</p>
+                <p className="text-xs text-muted-foreground">{data.alert.reason}</p>
               </div>
             )}
 
             {/* Triggered playbook */}
-            {data.triggeredPlaybook && (
+            {data.playbook && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-foreground">{data.triggeredPlaybook.title}</p>
+                <p className="text-xs font-semibold text-foreground">{data.playbook.title}</p>
                 <div className="space-y-1.5">
-                  {data.triggeredPlaybook.steps.map((step, i) => (
+                  {data.playbook.steps.map((step, i) => (
                     <div key={i} className="flex items-start gap-2.5">
-                      {step.completed ? (
+                      {i < data.playbook!.autoCompletedCount ? (
                         <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                       ) : (
                         <Circle className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                       )}
-                      <p className="text-xs text-foreground">{step.action}</p>
+                      <p className="text-xs text-foreground">{step}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Other active playbooks */}
-            {data.otherPlaybooks && data.otherPlaybooks.length > 0 && (
+            {/* Other patients also needing attention */}
+            {data.otherActive && data.otherActive.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground mb-1.5">Other Active Playbooks</p>
+                <p className="text-xs font-semibold text-muted-foreground mb-1.5">Other Patients Needing Attention</p>
                 <div className="space-y-1">
-                  {data.otherPlaybooks.map((pb, i) => (
-                    <p key={i} className="text-xs text-foreground bg-muted rounded px-2 py-1">{pb.title}</p>
+                  {data.otherActive.map((o, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 bg-muted rounded px-2 py-1.5">
+                      <p className="text-xs text-foreground truncate">{o.patientName} · {o.title}</p>
+                      <span className={`text-xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${SEVERITY_COLOR[o.severity] ?? ''}`}>
+                        {o.severity}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>

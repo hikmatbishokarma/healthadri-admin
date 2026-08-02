@@ -9,13 +9,11 @@ interface Patient {
   name: string;
   patientCode: string;
   cancerType: string;
-  cancerStage: string;
-  avatar: string;
+  stage: string;
   acuityScore: number;
-  alertSeverity?: string;
-  alertReason?: string;
-  lastSymptomAt?: string;
-  followUpDate?: string;
+  priority: 'HIGH' | 'MED' | 'LOW';
+  topSymptom: string | null;
+  lastUpdatedAt: string | null;
 }
 
 const SEVERITY_COLOR: Record<string, string> = {
@@ -49,9 +47,9 @@ export function NavPatientsPage() {
 
     const matchFilter =
       filter === 'All' ||
-      (filter === 'High' && p.alertSeverity === 'HIGH') ||
-      (filter === 'Med' && p.alertSeverity === 'MED') ||
-      (filter === 'Low' && p.alertSeverity === 'LOW');
+      (filter === 'High' && p.priority === 'HIGH') ||
+      (filter === 'Med' && p.priority === 'MED') ||
+      (filter === 'Low' && p.priority === 'LOW');
 
     return matchSearch && matchFilter;
   });
@@ -119,19 +117,20 @@ export function NavPatientsPage() {
                 <span className="text-xs text-muted-foreground">{patient.patientCode}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                {patient.cancerType || '—'} · Stage {patient.cancerStage || '—'}
+                {patient.cancerType || '—'}
+                {patient.stage && ` · ${patient.stage}`}
               </p>
-              {patient.alertReason && (
-                <p className="text-xs text-muted-foreground mt-0.5 truncate">{patient.alertReason}</p>
+              {patient.topSymptom && (
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">{patient.topSymptom}</p>
               )}
             </div>
-            {patient.alertSeverity && (
+            {patient.topSymptom && (
               <span
                 className={`text-xs font-medium px-2 py-0.5 rounded border flex-shrink-0 ${
-                  SEVERITY_COLOR[patient.alertSeverity] ?? 'bg-muted text-muted-foreground border-border'
+                  SEVERITY_COLOR[patient.priority] ?? 'bg-muted text-muted-foreground border-border'
                 }`}
               >
-                {patient.alertSeverity}
+                {patient.priority}
               </span>
             )}
           </div>

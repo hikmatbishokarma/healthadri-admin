@@ -6,6 +6,7 @@ import {
   BookOpen,
   Activity,
   UserCheck,
+  Pill,
   type LucideIcon,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +21,7 @@ type Counts = {
   doctors: number;
   playbooks: number;
   symptoms: number;
+  medicines: number;
 };
 
 const STATS: Array<{
@@ -34,6 +36,7 @@ const STATS: Array<{
   { key: 'doctors',    label: 'Doctors',    icon: Stethoscope, tint: 'text-violet-600 bg-violet-50' },
   { key: 'playbooks',  label: 'Playbooks',  icon: BookOpen,    tint: 'text-amber-600 bg-amber-50' },
   { key: 'symptoms',   label: 'Symptoms',   icon: Activity,    tint: 'text-rose-600 bg-rose-50' },
+  { key: 'medicines',  label: 'Medicines',  icon: Pill,        tint: 'text-teal-600 bg-teal-50' },
 ];
 
 export function DashboardPage() {
@@ -45,13 +48,14 @@ export function DashboardPage() {
     let cancelled = false;
     const load = async () => {
       try {
-        const [patients, navigators, hospitals, doctors, playbooks, symptoms] = await Promise.all([
+        const [patients, navigators, hospitals, doctors, playbooks, symptoms, medicines] = await Promise.all([
           api.get('/users/patients'),
           api.get('/users/navigators'),
           api.get('/hospitals'),
           api.get('/doctors'),
           api.get('/playbooks'),
           api.get('/symptoms'),
+          api.get('/medicines'),
         ]);
         if (cancelled) return;
         setCounts({
@@ -61,9 +65,10 @@ export function DashboardPage() {
           doctors:    doctors.data?.total ?? 0,
           playbooks:  playbooks.data?.total ?? 0,
           symptoms:   symptoms.data?.total ?? 0,
+          medicines:  medicines.data?.total ?? 0,
         });
       } catch {
-        if (!cancelled) setCounts({ patients: 0, navigators: 0, hospitals: 0, doctors: 0, playbooks: 0, symptoms: 0 });
+        if (!cancelled) setCounts({ patients: 0, navigators: 0, hospitals: 0, doctors: 0, playbooks: 0, symptoms: 0, medicines: 0 });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -81,7 +86,7 @@ export function DashboardPage() {
         description="Overview of the Healthadri system."
       />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
         {STATS.map(({ key, label, icon: Icon, tint }) => (
           <Card key={key}>
             <CardContent className="pt-6">
